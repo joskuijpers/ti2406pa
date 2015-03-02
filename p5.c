@@ -13,6 +13,7 @@
 
 #define MAX_SEQ 7	/* should be 2^n - 1 */
 typedef enum {frame_arrival, cksum_err, timeout, network_layer_ready} event_type;
+#include <unistd.h>
 #include "protocol.h"
 
 static boolean between(seq_nr a, seq_nr b, seq_nr c)
@@ -121,5 +122,7 @@ int main(int argc, char *argv[])
     
     printf("\n\n Simulating Protocol 5\n");
     start_simulator(protocol5, protocol5, event, timeout_interval, pkt_loss, garbled, debug_flags);
+
+    return 0;
 }
 

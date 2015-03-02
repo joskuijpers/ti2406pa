@@ -14,6 +14,7 @@
 #define NR_BUFS ((MAX_SEQ + 1) / 2)
 /* changed from MAX_SEQ+1 / 2 ,and back */ /*JH*/
 typedef enum {frame_arrival, cksum_err, timeout, network_layer_ready, ack_timeout} event_type;
+#include <unistd.h>
 #include "protocol.h"
 boolean no_nak = true;	/* no nak has been sent yet */
 
@@ -119,7 +120,7 @@ void protocol6(void)
     }
 }
 
-main (int argc, char *argv[])
+int main (int argc, char *argv[])
 {
     int timeout_interval, pkt_loss, garbled, debug_flags;
     long event;
@@ -133,4 +134,6 @@ main (int argc, char *argv[])
     init_max_seqnr(MAX_SEQ + 1);
     printf("\n\n Simulating Protocol 6\n");
     start_simulator(protocol6, protocol6, event, timeout_interval, pkt_loss, garbled, debug_flags);
+
+    return 0;
 }
