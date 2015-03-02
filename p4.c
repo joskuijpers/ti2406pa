@@ -41,8 +41,10 @@ void protocol4 (void)
 
     while (true) {
         wait_for_event(&event);	/* could be: frame_arrival, cksum_err, timeout */
-        if ((event != frame_arrival) && (event != cksum_err) &&
-            (event != timeout)) printf("\n SOMETHING WEIRD\n");
+
+        if ((event != frame_arrival) && (event != cksum_err) && (event != timeout))
+            printf("\n SOMETHING WEIRD\n");
+
         if (event == frame_arrival) { /* a frame has arrived undamaged. */
             from_physical_layer(&r);	/* go get it */
 
@@ -58,6 +60,7 @@ void protocol4 (void)
                 inc(next_frame_to_send);	/* invert sender's sequence number */
             }
         }
+        
         init_frame(&s);
         s.kind = data;
         s.info = buffer;	/* construct outbound frame */
