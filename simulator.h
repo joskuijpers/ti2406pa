@@ -1,6 +1,14 @@
 /* Data structures. */
 
-typedef enum {frame_arrival, cksum_err, timeout, network_layer_ready, ack_timeout} event_type;
+typedef enum {
+    no_event = -1,
+    frame_arrival,
+    cksum_err,
+    timeout,
+    network_layer_ready,
+    ack_timeout
+} event_type;
+
 #include "protocol.h"
 typedef unsigned long bigint;	/* bigint integer type available */
 

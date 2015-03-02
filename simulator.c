@@ -18,7 +18,6 @@
 #define NR_TIMERS 8             /* number of timers; this should be greater
 than half the number of sequence numbers. */
 #define MAX_QUEUE 1000            /* max number of buffered frames */
-#define NO_EVENT -1             /* no event possible */
 #define FRAME_SIZE (sizeof(frame))
 #define BYTE 0377               /* byte mask */
 #define UINT_MAX  0xFFFFFFFF    /* maximum value of an unsigned 32-bit int */
@@ -387,7 +386,7 @@ void wait_for_event(event_type *event)
 
         /* Now pick event. */
         *event = pick_event();
-        if (*event == NO_EVENT) {
+        if (*event == no_event) {
             word = (lowest_timer == 0 ? NOTHING : OK);
             continue;
         }
@@ -436,7 +435,6 @@ void queue_frames(void)
 
     int prfd, frct, k;
     frame *top;
-    struct stat statbuf;
 
     prfd = (id == 0 ? r2 : r1);	/* which file descriptor is pipe on */
 
@@ -488,7 +486,7 @@ int pick_event(void)
     if (nframes > 0) return((int)frametype());
     if (network_layer_status) return(network_layer_ready);
     if (check_timers() >= 0) return(timeout);	/* timer went off */
-    return(NO_EVENT);
+    return no_event;
 }
 
 
