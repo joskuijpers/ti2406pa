@@ -1,4 +1,4 @@
-CFLAGS=-D_POSIX_SOURCE
+CFLAGS=-D_POSIX_SOURCE -m32
 OBJ = simulator.o p2.o p3.o p4.o p5.o p6.o
 CC=clang
 
