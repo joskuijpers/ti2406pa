@@ -16,6 +16,7 @@
 typedef enum  {frame_arrival, cksum_err, timeout} event_type;
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include "protocol.h"
 
 void sender3(void);
@@ -59,6 +60,7 @@ void sender3(void)
         if (event == frame_arrival) {
                 from_physical_layer(&s);	/* get the acknowledgement */
                 if (s.ack == next_frame_to_send) {
+                        stop_timer(s.ack);
                         from_network_layer(&buffer);	/* get the next one to send */
                         inc(next_frame_to_send);	/* invert next_frame_to_send */
                 }

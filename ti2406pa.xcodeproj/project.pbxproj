@@ -139,6 +139,7 @@
 				806F42BD1AA4577A00B3335A /* Products */,
 			);
 			sourceTree = "<group>";
+			usesTabs = 0;
 		};
 		806F42AB1AA4553F00B3335A /* src */ = {
 			isa = PBXGroup;
