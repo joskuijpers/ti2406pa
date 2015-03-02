@@ -85,12 +85,10 @@
 		806F42E31AA45B1000B3335A /* p4 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = p4; sourceTree = BUILT_PRODUCTS_DIR; };
 		806F42ED1AA45B1000B3335A /* p5 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = p5; sourceTree = BUILT_PRODUCTS_DIR; };
 		806F42F41AA45F3600B3335A /* log0 */ = {isa = PBXFileReference; lastKnownFileType = text; path = log0; sourceTree = "<group>"; };
-		806F42F51AA45F3600B3335A /* log0.xx */ = {isa = PBXFileReference; lastKnownFileType = text; path = log0.xx; sourceTree = "<group>"; };
 		806F42F61AA45F3600B3335A /* log1 */ = {isa = PBXFileReference; lastKnownFileType = text; path = log1; sourceTree = "<group>"; };
-		806F42F71AA45F3600B3335A /* log1.xx */ = {isa = PBXFileReference; lastKnownFileType = text; path = log1.xx; sourceTree = "<group>"; };
-		806F42F81AA45F3600B3335A /* log2.xx */ = {isa = PBXFileReference; lastKnownFileType = text; path = log2.xx; sourceTree = "<group>"; };
 		806F42F91AA45F3600B3335A /* logM */ = {isa = PBXFileReference; lastKnownFileType = text; path = logM; sourceTree = "<group>"; };
 		806F42FA1AA4605E00B3335A /* combinelogs.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = combinelogs.sh; sourceTree = "<group>"; };
+		806F42FB1AA4621200B3335A /* logCombined */ = {isa = PBXFileReference; lastKnownFileType = text; path = logCombined; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -192,11 +190,9 @@
 			isa = PBXGroup;
 			children = (
 				806F42F41AA45F3600B3335A /* log0 */,
-				806F42F51AA45F3600B3335A /* log0.xx */,
 				806F42F61AA45F3600B3335A /* log1 */,
-				806F42F71AA45F3600B3335A /* log1.xx */,
-				806F42F81AA45F3600B3335A /* log2.xx */,
 				806F42F91AA45F3600B3335A /* logM */,
+				806F42FB1AA4621200B3335A /* logCombined */,
 			);
 			name = logs;
 			sourceTree = "<group>";
