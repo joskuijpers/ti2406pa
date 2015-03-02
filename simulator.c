@@ -182,7 +182,7 @@ void start_simulator(void (*p1)(), void (*p2)(), long event, int tm_out, int pk_
 
     /* Turn tracing options on or off.  The bits are defined in worker.c. */
     debug_flags = d_flags;
-    printf("\n\nEvents: %u    Parameters: %u %d %u\n",
+    printf("\n\nEvents: %lu    Parameters: %lu %d %u\n",
            last_tick/DELTA, timeout_interval/DELTA, pkt_loss/10, garbled/10);
 
     set_up_pipes();		/* create five pipes */
@@ -194,8 +194,8 @@ void start_simulator(void (*p1)(), void (*p2)(), long event, int tm_out, int pk_
         tick = tick + DELTA;
         rfd = (process == 0 ? r4 : r6);
         if (read(rfd, &word, TICK_SIZE) != TICK_SIZE) terminate("");
-        /**/ fprintf(flog,"XM01 %d process=%d word=%d\n", tick/DELTA, process, word);
-        /**/ fflush;
+        /**/ fprintf(flog,"XM01 %lu process=%d word=%lu\n", tick/DELTA, process, word);
+        /**/ fflush(NULL);
         if (word == OK) hanging[process] = 0;
         if (word == NOTHING) hanging[process] += DELTA;
         if (hanging[0] >= DEADLOCK && hanging[1] >= DEADLOCK)
@@ -205,8 +205,8 @@ void start_simulator(void (*p1)(), void (*p2)(), long event, int tm_out, int pk_
         wfd = (process == 0 ? w3 : w5);
         if (write(wfd, &tick, TICK_SIZE) != TICK_SIZE)
             terminate("Main could not write to worker");
-        /**/ fprintf(flog,"XM02 %d process=%d\n", tick/DELTA, process);
-        /**/ fflush;
+        /**/ fprintf(flog,"XM02 %lu process=%d\n", tick/DELTA, process);
+        /**/ fflush(NULL);
 
     }
 
@@ -344,7 +344,7 @@ void terminate(char *s)
             eff = (100 * acc)/sent;
             printf("\nEfficiency (payloads accepted/data pkts sent) = %d%c\n", eff, '%');
         }
-        printf("%s.  Time=%u\n",s, tick/DELTA);
+        printf("%s.  Time=%lu\n",s, tick/DELTA);
     }
     exit(1);
 }
@@ -373,14 +373,17 @@ void wait_for_event(event_type *event)
     retransmitting = 0;		/* counts retransmissions */
     while (true) {
         queue_frames();		/* go get any newly arrived frames */
-        if (write(mwfd, &word, TICK_SIZE) != TICK_SIZE) print_statistics();
-        /**/ fprintf(flog,"XWF1 %d word=%d\n", tick/DELTA, word);
-        /**/ fflush;
+        if (write(mwfd, &word, TICK_SIZE) != TICK_SIZE)
+            print_statistics();
+
+        /**/ fprintf(flog,"XWF1 %lu word=%lu\n", tick/DELTA, word);
+        /**/ fflush(NULL);
+
         if (read(mrfd, &ct, TICK_SIZE) != TICK_SIZE) print_statistics();
         if (ct == 0) print_statistics();
         tick = ct;		/* update time */
         if ((debug_flags & PERIODIC) && (tick%INTERVAL == 0))
-            printf("Tick %u. Proc %d. Data sent=%d  Payloads accepted=%d  Timeouts=%d\n", tick/DELTA, id, data_sent, payloads_accepted, timeouts);
+            printf("Tick %lu. Proc %d. Data sent=%d  Payloads accepted=%d  Timeouts=%d\n", tick/DELTA, id, data_sent, payloads_accepted, timeouts);
 
         /* Now pick event. */
         *event = pick_event();
@@ -392,18 +395,15 @@ void wait_for_event(event_type *event)
         if (*event == timeout) {
             timeouts++;
             retransmitting = 1;	/* enter retransmission mode */
-            fprintf(flog,"XXX1%6d T%2d timeout for frame %d\n",
-                    tick/DELTA, id, oldest_frame);
+            fprintf(flog,"XXX1%6lu T%2d timeout for frame %d\n",tick/DELTA, id, oldest_frame);
             if (debug_flags & TIMEOUTS)
-                printf("Tick %u. Proc %d got timeout for frame %d\n",
-                       tick/DELTA, id, oldest_frame);
+                printf("Tick %lu. Proc %d got timeout for frame %d\n",tick/DELTA, id, oldest_frame);
         }
 
         if (*event == ack_timeout) {
             ack_timeouts++;
             if (debug_flags & TIMEOUTS)
-                printf("Tick %u. Proc %d got ack timeout\n",
-                       tick/DELTA, id);
+                printf("Tick %lu. Proc %d got ack timeout\n",tick/DELTA, id);
         }
         return;
     }
@@ -533,8 +533,7 @@ event_type frametype(void)
     }
 
     if (debug_flags & RECEIVES) {
-        printf("Tick %u. Proc %d got %s frame:  ",
-               tick/DELTA,id,badgood[i]);
+        printf("Tick %lu. Proc %d got %s frame:  ",tick/DELTA,id,badgood[i]);
         fr(&last_frame);
     }
     return(event);
@@ -564,7 +563,7 @@ void to_network_layer(packet *p)
 
     num = pktnum(p);
     if (num != last_pkt_given + 1) {
-        printf("Tick %u. Proc %d got protocol error.  Packet delivered out of order.\n", tick/DELTA, id);
+        printf("Tick %lu. Proc %d got protocol error.  Packet delivered out of order.\n", tick/DELTA, id);
         printf("Expected payload %d but got payload %d\n",last_pkt_given+1,num);
         exit(0);
     }
@@ -577,7 +576,7 @@ void from_physical_layer (frame *r)
 {
     /* Copy the newly-arrived frame to the user. */
     *r = last_frame;
-    fprintf(flog,"PFF4 tick %u, from_ph: r->seq=%d, r->ack=%d\n", tick/DELTA, r->seq, r->ack);
+    fprintf(flog,"PFF4 tick %lu, from_ph: r->seq=%u, r->ack=%u\n", tick/DELTA, r->seq, r->ack);
     fflush(flog);
     flog_frame(r,'R');
 }
@@ -606,15 +605,14 @@ void to_physical_layer(frame *s)
     if (s->kind == data) data_sent++;
     if (s->kind == ack) acks_sent++;
     if (retransmitting) data_retransmitted++;
-    fprintf(flog,"PTF5 tick %u, to_ph: s->seq=%d, s->ack=%d\n", tick/DELTA, s->seq, s->ack);
+    fprintf(flog,"PTF5 tick %lu, to_ph: s->seq=%u, s->ack=%u\n", tick/DELTA, s->seq, s->ack);
     fflush(flog);
     flog_frame(s,'S');
     /* Bad transmissions (checksum errors) are simulated here. */
     k = rand() & 01777;		/* 0 <= k <= about 1000 (really 1023) */
     if (k < pkt_loss) {	/* simulate packet loss */
         if (debug_flags & SENDS) {
-            printf("Tick %u. Proc %d sent frame that got lost: ",
-                   tick/DELTA, id);
+            printf("Tick %lu. Proc %d sent frame that got lost: ",tick/DELTA, id);
             fr(s);
         }
         if (s->kind == data) data_lost++;	/* statistics gathering */
@@ -630,7 +628,7 @@ void to_physical_layer(frame *s)
     if (got != FRAME_SIZE) print_statistics();	/* must be done */
 
     if (debug_flags & SENDS) {
-        printf("Tick %u. Proc %d sent frame: ", tick/DELTA, id);
+        printf("Tick %lu. Proc %d sent frame: ", tick/DELTA, id);
         fr(s);
     }
 }
@@ -715,7 +713,7 @@ int check_timers(void)
             return(i);
         }
     }
-    printf("Impossible.  check_timers failed at %d\n", lowest_timer);
+    printf("Impossible.  check_timers failed at %lu\n", lowest_timer);
     exit(1);
 }
 
@@ -734,7 +732,7 @@ int check_ack_timer()
 
 void flog_frame(frame *f, char sr)
 {
-    fprintf(flog,"XXXX%6d %c%2d",tick/DELTA,sr,id);
+    fprintf(flog,"XXXX%6lu %c%2d",tick/DELTA,sr,id);
     if (id==0) {
         fprintf(flog,"%4d %4s%4d%4d ",
                 pktnum(&f->info), tag[f->kind], f->seq, f->ack);
@@ -765,7 +763,7 @@ void print_queue(void) /*JH*/
     for (i=0; i<k; i++)
     { kk=outp-queue;
         prt_frame = queue[kk+i];
-        fprintf(flog, "XPQ1 pos=%d, seq=%d, ack=%d, info=%d\n",
+        fprintf(flog, "XPQ1 pos=%d, seq=%u, ack=%u, info=%d\n",
                 kk+i, prt_frame.seq, prt_frame.ack, pktnum(&prt_frame.info));
     }
     fflush(flog);
@@ -774,7 +772,7 @@ void print_queue(void) /*JH*/
     {  kk = inp-queue;
         for (i=0;i<kk; i++)
         {  prt_frame = queue[i];
-            fprintf(flog, "XPQ2 pos=%d, seq=%d, ack=%d, info=%d\n",
+            fprintf(flog, "XPQ2 pos=%d, seq=%u, ack=%u, info=%d\n",
                     i, prt_frame.seq, prt_frame.ack, pktnum(&prt_frame.info));
         }
         fflush(flog);
@@ -802,7 +800,7 @@ void fr(frame *f)
 {
     /* Print frame information for tracing. */
 
-    printf("type=%s  seq=%d  ack=%d  payload=%d\n",
+    printf("type=%s  seq=%u  ack=%u  payload=%d\n",
            tag[f->kind], f->seq, f->ack, pktnum(&f->info));
 }
 
@@ -818,15 +816,15 @@ void recalc_timers(void)
     }
     lowest_timer = t;
 
-    fprintf(flog,"XRC1%6d %3d seqs=", tick, id); /*JH*/
+    fprintf(flog,"XRC1%6lu %3d seqs=", tick, id); /*JH*/
     for (i=0; i < NR_TIMERS; i++) {            /*JH*/
-        fprintf(flog,"%2d",seqs[i]);           /*JH*/
+        fprintf(flog,"%2u",seqs[i]);           /*JH*/
     }                                          /*JH*/
     fprintf(flog,"ack_timer=");                /*JH*/
     for (i=0; i < NR_TIMERS; i++) {            /*JH*/
-        fprintf(flog,"%4d", ack_timer[i]);         /*JH*/
+        fprintf(flog,"%4lu", ack_timer[i]);         /*JH*/
     }                                          /*JH*/
-    fprintf(flog,"lowest=%d\n",lowest_timer);  /*JH*/
+    fprintf(flog,"lowest=%lu\n",lowest_timer);  /*JH*/
 }
 
 
