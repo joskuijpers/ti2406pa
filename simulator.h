@@ -7,8 +7,8 @@ typedef unsigned long bigint;	/* bigint integer type available */
 /* General constants */
 #define TICK_SIZE (sizeof(tick))
 #define DELTA 10		/* must be greater than NR_TIMERS so each
-				 * timer can go off at a separate tick.
-				 */
+                         * timer can go off at a separate tick.
+                        */
 
 /* Reply codes sent by workers back to main. */
 #define OK      1		/* normal response */

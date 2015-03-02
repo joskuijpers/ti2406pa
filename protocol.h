@@ -9,10 +9,10 @@ typedef struct {unsigned char data[MAX_PKT];} packet;	/* packet definition */
 typedef enum {data, ack, nak} frame_kind;	/* frame_kind definition */
 
 typedef struct {	/* frames are transported in this layer */
-  frame_kind kind;	/* what kind of a frame is it? */
-  seq_nr seq;   	/* sequence number */
-  seq_nr ack;   	/* acknowledgement number */
-  packet info;  	/* the network layer packet */
+    frame_kind kind;	/* what kind of a frame is it? */
+    seq_nr seq;   	/* sequence number */
+    seq_nr ack;   	/* acknowledgement number */
+    packet info;  	/* the network layer packet */
 } frame;
 
 /* start_simulator initializes various simulator parameters and starts the
