@@ -16,7 +16,10 @@ typedef enum {frame_arrival, cksum_err, timeout} event_type;
 #include <stdlib.h>
 #include "protocol.h"
 
-void protocol4 (void)
+/**
+ * With Wait For Peer, wait for the first ACK before sending.
+ */
+void protocol4 (_Bool wait_for_peer)
 {
     seq_nr next_frame_to_send;	/* 0 or 1 only */
     seq_nr frame_expected;	/* 0 or 1 only */
@@ -31,13 +34,21 @@ void protocol4 (void)
     next_frame_to_send = 0;	/* next frame on the outbound stream */
     frame_expected = 0;	/* number of frame arriving frame expected */
     from_network_layer(&buffer);	/* fetch a packet from the network layer */
-    init_frame(&s);
-    s.kind = data;
-    s.info = buffer;	/* prepare to send the initial frame */
-    s.seq = next_frame_to_send;	/* insert sequence number into frame */
-    s.ack = 1 - frame_expected;	/* piggybacked ack */
-    to_physical_layer(&s);	/* transmit the frame */
-    start_timer(s.seq);	/* start the timer running */
+
+    /**
+     * If we wait for the peer, we do not send a packet until
+     * we received a packet from the peer. This way, no no-payload packets are
+     * needed for acking.
+     */
+    if(!wait_for_peer) {
+        init_frame(&s);
+        s.kind = data;
+        s.info = buffer;	/* prepare to send the initial frame */
+        s.seq = next_frame_to_send;	/* insert sequence number into frame */
+        s.ack = 1 - frame_expected;	/* piggybacked ack */
+        to_physical_layer(&s);	/* transmit the frame */
+        start_timer(s.seq);	/* start the timer running */
+    }
 
     while (true) {
         wait_for_event(&event);	/* could be: frame_arrival, cksum_err, timeout */
@@ -71,6 +82,16 @@ void protocol4 (void)
     }
 }
 
+// wait for peer pointer
+void protocol4_wfp() {
+    return protocol4(true);
+}
+
+// not wait for peer pointer
+void protocol4_nwfp() {
+    return protocol4(false);
+}
+
 int main (int argc, char *argv[])
 {
     int timeout_interval, pkt_loss, garbled, debug_flags;
@@ -83,7 +104,7 @@ int main (int argc, char *argv[])
     }
 
     printf("\n\n Simulating Protocol 4\n");
-    start_simulator(protocol4, protocol4, event, timeout_interval, pkt_loss, garbled, debug_flags);
+    start_simulator(protocol4_wfp, protocol4_nwfp, event, timeout_interval, pkt_loss, garbled, debug_flags);
 
     return 0;
 }
