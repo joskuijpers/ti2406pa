@@ -90,6 +90,7 @@
 		806F42F71AA45F3600B3335A /* log1.xx */ = {isa = PBXFileReference; lastKnownFileType = text; path = log1.xx; sourceTree = "<group>"; };
 		806F42F81AA45F3600B3335A /* log2.xx */ = {isa = PBXFileReference; lastKnownFileType = text; path = log2.xx; sourceTree = "<group>"; };
 		806F42F91AA45F3600B3335A /* logM */ = {isa = PBXFileReference; lastKnownFileType = text; path = logM; sourceTree = "<group>"; };
+		806F42FA1AA4605E00B3335A /* combinelogs.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = combinelogs.sh; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -158,6 +159,7 @@
 		806F42B41AA4558A00B3335A /* extra */ = {
 			isa = PBXGroup;
 			children = (
+				806F42FA1AA4605E00B3335A /* combinelogs.sh */,
 				806F42B51AA455A900B3335A /* doc.md */,
 				806F42B61AA455A900B3335A /* Makefile */,
 				806F42B71AA455A900B3335A /* README.md */,
