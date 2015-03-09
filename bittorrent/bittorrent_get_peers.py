@@ -11,7 +11,7 @@ from urllib import quote,urlopen, urlencode,unquote
 from os.path import basename
 from socket import *
 
-# connects to tracker specified by <code>url</code> and retrieves a list of 20 
+# connects to tracker specified by <code>url</code> and retrieves a list of 20
 # random peers
 #
 def get_random_peers(url):
@@ -22,17 +22,21 @@ def get_random_peers(url):
         response = bdecode(raw_response)
         peers = response.get('peers')
         random_peers = []
+
         if type(peers) == type(''):
             for peer in xrange(0, len(peers), 6):
                 ip = '.'.join([str(ord(i)) for i in peers[peer:peer+4]])
                 port = (ord(peers[peer+4]) << 8) | ord(peers[peer+5])
                 random_peers.append((ip, port))
+        elif peers is None:
+            print "No peers found in the announce"
         else:
             for peer in peers:
                 random_peers.append([peer.get('ip'), "%s" % peer.get('port')])
         return random_peers
-    except TypeError:
+    except TypeError as e:
         print "Result Failed Type error."
+        print e
         exit(2)
     except IOError:
         print "Result Failed I/O Exception occurred. Check URL."
@@ -45,7 +49,7 @@ def get_random_peers(url):
 def dump_peers(torrent_file_name, peers):
     for peer in peers:
         print peer
-    
+
 # respresents the torrent file meta data
 #
 class FileMeta:
